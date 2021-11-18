@@ -216,7 +216,9 @@ namespace Nekoyume.Action
 
             Result = simulator.Log;
             EnemyAvatarState = enemyAvatarState;
-            ArenaInfo = arenaInfo;
+            var previousArenaInfo = ctx.PreviousStates.GetWeeklyArenaState(weeklyArenaAddress)[avatarAddress];
+            var ai = arenaInfo;
+            ArenaInfo = previousArenaInfo;
             EnemyInfo = enemyArenaInfo;
 
             foreach (var itemBase in simulator.Reward.OrderBy(i => i.Id))
