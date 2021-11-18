@@ -30,6 +30,9 @@ namespace Nekoyume.Action
         public List<Guid> equipmentIds;
         public List<Guid> consumableIds;
         public BattleLog Result { get; private set; }
+        public AvatarState AvatarState;
+        public ArenaInfo ArenaInfo;
+        public ArenaInfo EnemyInfo;
 
         public override IAccountStateDelta Execute(IActionContext context)
         {
@@ -212,6 +215,7 @@ namespace Nekoyume.Action
             sw.Restart();
 
             Result = simulator.Log;
+            AvatarState = enemyAvatarState;
 
             foreach (var itemBase in simulator.Reward.OrderBy(i => i.Id))
             {
