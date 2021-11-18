@@ -216,6 +216,8 @@ namespace Nekoyume.Action
 
             Result = simulator.Log;
             AvatarState = enemyAvatarState;
+            ArenaInfo = arenaInfo;
+            EnemyInfo = enemyArenaInfo;
 
             foreach (var itemBase in simulator.Reward.OrderBy(i => i.Id))
             {
