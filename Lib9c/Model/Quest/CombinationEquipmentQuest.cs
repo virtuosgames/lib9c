@@ -8,6 +8,7 @@ using Nekoyume.TableData;
 
 namespace Nekoyume.Model.Quest
 {
+    [Serializable]
     public class CombinationEquipmentQuest : Quest
     {
         public readonly int RecipeId;

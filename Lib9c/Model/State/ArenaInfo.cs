@@ -10,8 +10,10 @@ using Nekoyume.TableData;
 
 namespace Nekoyume.Model.State
 {
+    [Serializable]
     public class ArenaInfo : IState
     {
+        [Serializable]
         public class Record : IState
         {
             public int Win;
