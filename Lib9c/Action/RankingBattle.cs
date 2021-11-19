@@ -29,10 +29,10 @@ namespace Nekoyume.Action
         public List<Guid> costumeIds;
         public List<Guid> equipmentIds;
         public List<Guid> consumableIds;
+        public AvatarState EnemyAvatarState;
+        public ArenaInfo ArenaInfo;
+        public ArenaInfo EnemyInfo;
         public BattleLog Result { get; private set; }
-        public AvatarState EnemyAvatarState { get; private set; }
-        public ArenaInfo ArenaInfo { get; private set; }
-        public ArenaInfo EnemyInfo { get; private set; }
 
         public override IAccountStateDelta Execute(IActionContext context)
         {
@@ -216,9 +216,7 @@ namespace Nekoyume.Action
 
             Result = simulator.Log;
             EnemyAvatarState = enemyAvatarState;
-            var previousArenaInfo = ctx.PreviousStates.GetWeeklyArenaState(weeklyArenaAddress)[avatarAddress];
-            var ai = arenaInfo;
-            ArenaInfo = previousArenaInfo;
+            ArenaInfo = arenaInfo;
             EnemyInfo = enemyArenaInfo;
 
             foreach (var itemBase in simulator.Reward.OrderBy(i => i.Id))
