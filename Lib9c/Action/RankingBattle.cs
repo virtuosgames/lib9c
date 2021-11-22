@@ -295,6 +295,7 @@ namespace Nekoyume.Action
 
             var ended = DateTimeOffset.UtcNow;
             Log.Verbose("{AddressesHex}RankingBattle Total Executed Time: {Elapsed}", addressesHex, ended - started);
+            Result = new BattleLog();
             EnemyAvatarState = serializedEnemyAvatarState;
             EnemyArenaInfo = serializedEnemyArenaInfo;
             ArenaInfo = serializedArenaInfo;
