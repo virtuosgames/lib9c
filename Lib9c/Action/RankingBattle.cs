@@ -214,7 +214,7 @@ namespace Nekoyume.Action
             );
             sw.Restart();
 
-            Result = simulator.Log;
+            Result = new BattleLog();
             EnemyAvatarState = enemyAvatarState;
             ArenaInfo = arenaInfo;
             EnemyInfo = enemyArenaInfo;
