@@ -495,67 +495,6 @@ namespace Lib9c.Tests.Action
             Assert.Equal(updatedAddresses.ToImmutableHashSet(), nextState.UpdatedAddresses);
         }
 
-        [Fact]
-        public void Serialize_With_DotnetAPI()
-        {
-            var action = new RankingBattle
-            {
-                avatarAddress = _avatar1Address,
-                enemyAddress = _avatar2Address,
-                weeklyArenaAddress = _weeklyArenaAddress,
-                costumeIds = new List<Guid>(),
-                equipmentIds = new List<Guid>(),
-                consumableIds = new List<Guid>(),
-            };
-            action.Execute(new ActionContext()
-            {
-                PreviousStates = _initialState,
-                Signer = _agent1Address,
-                Random = new TestRandom(),
-                Rehearsal = false,
-            });
-
-            var formatter = new BinaryFormatter();
-            using var ms = new MemoryStream();
-            formatter.Serialize(ms, action);
-            ms.Seek(0, SeekOrigin.Begin);
-
-            var deserialized = (RankingBattle)formatter.Deserialize(ms);
-            Assert.Equal(action.PlainValue, deserialized.PlainValue);
-        }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void Serialize_With_MessagePack(bool execute)
-        {
-            var action = new RankingBattle
-            {
-                avatarAddress = _avatar1Address,
-                enemyAddress = _avatar2Address,
-                weeklyArenaAddress = _weeklyArenaAddress,
-                costumeIds = new List<Guid>(),
-                equipmentIds = new List<Guid>(),
-                consumableIds = new List<Guid>(),
-            };
-            if (execute)
-            {
-                action.Execute(new ActionContext()
-                {
-                    PreviousStates = _initialState,
-                    Signer = _agent1Address,
-                    Random = new TestRandom(),
-                    Rehearsal = false,
-                });
-            }
-
-            Assert.Equal(!execute, action.Result is null);
-            Assert.Equal(!execute, action.EnemyAvatarState is null);
-            Assert.Equal(!execute, action.ArenaInfo is null);
-            Assert.Equal(!execute, action.EnemyArenaInfo is null);
-            ActionSerializer.AssertAction<RankingBattle>(action);
-        }
-
         [Theory]
         [InlineData(ItemSubType.Weapon, GameConfig.MaxEquipmentSlotCount.Weapon)]
         [InlineData(ItemSubType.Armor, GameConfig.MaxEquipmentSlotCount.Armor)]
