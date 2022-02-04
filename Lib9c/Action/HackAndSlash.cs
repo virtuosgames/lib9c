@@ -165,13 +165,13 @@ namespace Nekoyume.Action
             }
 
             var items = equipments.Concat(costumes);
+            var inventoryItems = avatarState.EquipItems(items);
             var requirementSheet = states.GetSheet<ItemRequirementSheet>();
-            foreach (var item in items)
+            foreach (var item in inventoryItems)
             {
-                var itemHash = item.GetHashCode();
-                if (!requirementSheet.TryGetValue(itemHash, out var requirementRow))
+                if (!requirementSheet.TryGetValue(item.item.Id, out var requirementRow))
                 {
-                    throw new SheetRowNotFoundException(addressesHex, nameof(ItemRequirementSheet), itemHash);
+                    throw new SheetRowNotFoundException(addressesHex, nameof(ItemRequirementSheet), item.item.Id);
                 }
 
                 if (requirementRow.Level > avatarState.level)
@@ -183,8 +183,6 @@ namespace Nekoyume.Action
             }
 
             avatarState.actionPoint -= totalCostActionPoint;
-
-            avatarState.EquipItems(items);
             sw.Stop();
             Log.Verbose("{AddressesHex}HAS Unequip items: {Elapsed}", addressesHex, sw.Elapsed);
             sw.Restart();
