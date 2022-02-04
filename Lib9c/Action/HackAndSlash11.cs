@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -15,8 +15,8 @@ using static Lib9c.SerializeKeys;
 namespace Nekoyume.Action
 {
     [Serializable]
-    [ActionType("hack_and_slash12")]
-    public class HackAndSlash : GameAction
+    [ActionType("hack_and_slash11")]
+    public class HackAndSlash11 : GameAction
     {
         public List<Guid> costumes;
         public List<Guid> equipments;
@@ -164,26 +164,9 @@ namespace Nekoyume.Action
                 );
             }
 
-            var items = equipments.Concat(costumes);
-            var requirementSheet = states.GetSheet<ItemRequirementSheet>();
-            foreach (var item in items)
-            {
-                var itemHash = item.GetHashCode();
-                if (!requirementSheet.TryGetValue(itemHash, out var requirementRow))
-                {
-                    throw new SheetRowNotFoundException(addressesHex, nameof(ItemRequirementSheet), itemHash);
-                }
-
-                if (requirementRow.Level > avatarState.level)
-                {
-                    throw new HighLevelItemRequirementException(
-                        $"{addressesHex}avatar level must be higher than requirement level of equipments." +
-                        $"{avatarState.level} < requirement level({requirementRow.Level})");
-                }
-            }
-
             avatarState.actionPoint -= totalCostActionPoint;
 
+            var items = equipments.Concat(costumes);
             avatarState.EquipItems(items);
             sw.Stop();
             Log.Verbose("{AddressesHex}HAS Unequip items: {Elapsed}", addressesHex, sw.Elapsed);
