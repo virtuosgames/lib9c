@@ -4,13 +4,16 @@ namespace Lib9c.Tests.Action
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.IO;
+    using System.IO.Compression;
     using System.Linq;
     using System.Runtime.Serialization.Formatters.Binary;
     using Bencodex.Types;
+    using Lib9c.Formatters;
     using Libplanet;
     using Libplanet.Action;
     using Libplanet.Crypto;
     using MessagePack;
+    using MessagePack.Resolvers;
     using Nekoyume;
     using Nekoyume.Action;
     using Nekoyume.Battle;
@@ -24,6 +27,7 @@ namespace Lib9c.Tests.Action
     using Xunit;
     using Xunit.Abstractions;
     using static SerializeKeys;
+    using Stopwatch = System.Diagnostics.Stopwatch;
 
     public class RankingBattleTest
     {
@@ -79,9 +83,16 @@ namespace Lib9c.Tests.Action
                 .SetState(_weeklyArenaAddress, weeklyArenaState.Serialize());
 
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
+                .MinimumLevel.Debug()
                 .WriteTo.TestOutput(outputHelper)
                 .CreateLogger();
+
+            var resolver = MessagePack.Resolvers.CompositeResolver.Create(
+                NineChroniclesResolver.Instance,
+                StandardResolver.Instance
+            );
+            var options = MessagePackSerializerOptions.Standard.WithResolver(resolver);
+            MessagePackSerializer.DefaultOptions = options;
         }
 
         public static (AgentState, AvatarState) GetAgentStateWithAvatarState(
@@ -245,6 +256,42 @@ namespace Lib9c.Tests.Action
             Assert.Equal(result.score, log.score);
             Assert.Equal(result.Count, log.Count);
             Assert.Equal(result.result, log.result);
+
+            var ncAction = new PolymorphicAction<ActionBase>(action);
+            var ncEval = new NCActionEvaluation(
+                ncAction,
+                _agent1Address,
+                1234,
+                nextState,
+                null,
+                previousState,
+                0,
+                new Dictionary<string, IValue>()
+            );
+            var evaluation = ncEval.ToActionEvaluation();
+            var sw = new Stopwatch();
+            sw.Start();
+            var b = MessagePackSerializer.Serialize(ncEval);
+            var c = new MemoryStream();
+            using (var df = new DeflateStream(c, CompressionLevel.Fastest))
+            {
+                df.Write(b, 0, b.Length);
+            }
+
+            var compressed = c.ToArray();
+            sw.Stop();
+            Log.Debug("Action: {Action}, Size: {Size} Time: {Time}", action, compressed.Length, sw.Elapsed);
+            using (var cp = new MemoryStream(compressed))
+            using (var decompressed = new MemoryStream())
+            using (var df = new DeflateStream(cp, CompressionMode.Decompress))
+            {
+                df.CopyTo(decompressed);
+                decompressed.Seek(0, SeekOrigin.Begin);
+                var dec = cp.ToArray();
+                Assert.Equal(compressed.Length, dec.Length);
+                var ev = MessagePackSerializer.Deserialize<NCActionEvaluation>(dec);
+                Assert.Equal(ncEval.Signer, ev.Signer);
+            }
         }
 
         [Fact]
