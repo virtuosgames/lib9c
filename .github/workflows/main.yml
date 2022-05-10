@@ -44,7 +44,7 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet test --no-restore --verbosity normal -- xunit.parallelizeAssembly=true
 
   release:
     if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
