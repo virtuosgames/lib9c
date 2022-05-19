@@ -286,14 +286,14 @@ namespace Nekoyume.Action
             var states2 = states.GetState(enemyAddress);
             var states3 = states.GetState(weeklyArenaAddress);
             if (states1 != null)
-                Log.Debug("KDS {BlockIndex}/ {TxId}/ RankingBattle/ Avatar State {state}/ HashSet: {hashset}", ctx.BlockIndex,
-                    ctx.TxId, states1.Inspect(true), states1.ToHashSet(StateExtensions.ToInteger));
+                Log.Debug("KDS {BlockIndex}/ {TxId}/ RankingBattle/ Avatar State {state}", ctx.BlockIndex,
+                    ctx.TxId, states1.Inspection);
             if (states2 != null)
-                Log.Debug("KDS {BlockIndex}/ {TxId}/ RankingBattle/ Enemy State {state}/ HashSet: {hashset}", ctx.BlockIndex,
-                    ctx.TxId, states2.Inspect(true), states2.ToHashSet(StateExtensions.ToInteger));
+                Log.Debug("KDS {BlockIndex}/ {TxId}/ RankingBattle/ Enemy State {state}", ctx.BlockIndex,
+                    ctx.TxId, states2.Inspection);
             if (states3 != null)
-                Log.Debug("KDS {BlockIndex}/ {TxId}/ RankingBattle/ WeeklyArenaAddress State {state}/ HashSet: {hashset}", ctx.BlockIndex,
-                    ctx.TxId, states3.Inspect(true), states3.ToHashSet(StateExtensions.ToInteger));
+                Log.Debug("KDS {BlockIndex}/ {TxId}/ RankingBattle/ WeeklyArenaAddress State {state}", ctx.BlockIndex,
+                    ctx.TxId, states3.Inspection);
             return states;
         }
 
