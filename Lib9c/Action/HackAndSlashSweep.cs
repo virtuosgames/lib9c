@@ -227,7 +227,7 @@ namespace Nekoyume.Action
                 .SetState(avatarAddress, avatarState.SerializeV2());
             var states1 = states.GetState(avatarAddress);
             if (states1 != null)
-                Log.Debug("KDS {BlockIndex}/ {TxId}/ RankingBattle/ Avatar State {state}", context.BlockIndex,
+                Log.Debug("KDS {BlockIndex}/ {TxId}/ HackAndSlashSweep/ Avatar State {state}", context.BlockIndex,
                     context.TxId, states1.Inspect(true));
             return states;
         }
