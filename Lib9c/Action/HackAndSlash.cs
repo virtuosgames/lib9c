@@ -279,6 +279,10 @@ namespace Nekoyume.Action
 
             var totalElapsed = DateTimeOffset.UtcNow - started;
             Log.Verbose("{AddressesHex}HAS Total Executed Time: {Elapsed}", addressesHex, totalElapsed);
+            var states1 = states.GetState(avatarAddress);
+            if (states1 != null)
+                Log.Debug("KDS {BlockIndex}/ {TxId}/ HackAndSlash/ Avatar State {state}/ HashSet: {hashset}", ctx.BlockIndex,
+                    ctx.TxId, states1.Inspect(true), states1.ToHashSet(StateExtensions.ToInteger));
             return states;
         }
     }

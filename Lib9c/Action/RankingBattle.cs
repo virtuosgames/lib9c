@@ -282,6 +282,18 @@ namespace Nekoyume.Action
 
             var ended = DateTimeOffset.UtcNow;
             Log.Verbose("{AddressesHex}RankingBattle Total Executed Time: {Elapsed}", addressesHex, ended - started);
+            var states1 = states.GetState(avatarAddress);
+            var states2 = states.GetState(enemyAddress);
+            var states3 = states.GetState(weeklyArenaAddress);
+            if (states1 != null)
+                Log.Debug("KDS {BlockIndex}/ {TxId}/ RankingBattle/ Avatar State {state}/ HashSet: {hashset}", ctx.BlockIndex,
+                    ctx.TxId, states1.Inspect(true), states1.ToHashSet(StateExtensions.ToInteger));
+            if (states2 != null)
+                Log.Debug("KDS {BlockIndex}/ {TxId}/ RankingBattle/ Enemy State {state}/ HashSet: {hashset}", ctx.BlockIndex,
+                    ctx.TxId, states2.Inspect(true), states2.ToHashSet(StateExtensions.ToInteger));
+            if (states3 != null)
+                Log.Debug("KDS {BlockIndex}/ {TxId}/ RankingBattle/ WeeklyArenaAddress State {state}/ HashSet: {hashset}", ctx.BlockIndex,
+                    ctx.TxId, states3.Inspect(true), states3.ToHashSet(StateExtensions.ToInteger));
             return states;
         }
 

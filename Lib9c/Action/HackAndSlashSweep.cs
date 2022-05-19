@@ -11,6 +11,7 @@ using Nekoyume.Helper;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.State;
 using Nekoyume.TableData;
+using Serilog;
 using static Lib9c.SerializeKeys;
 
 namespace Nekoyume.Action
@@ -220,10 +221,15 @@ namespace Nekoyume.Action
             var (level, exp) = avatarState.GetLevelAndExp(levelSheet, stageId, playCount);
             avatarState.UpdateExp(level, exp);
 
-            return states
+            states = states
                 .SetState(inventoryAddress, avatarState.inventory.Serialize())
                 .SetState(questListAddress, avatarState.questList.Serialize())
                 .SetState(avatarAddress, avatarState.SerializeV2());
+            var states1 = states.GetState(avatarAddress);
+            if (states1 != null)
+                Log.Debug("KDS {BlockIndex}/ {TxId}/ RankingBattle/ Avatar State {state}/ HashSet: {hashset}", context.BlockIndex,
+                    context.TxId, states1.Inspect(true), states1.ToHashSet(StateExtensions.ToInteger));
+            return states;
         }
 
         public static List<ItemBase> GetRewardItems(IRandom random,
