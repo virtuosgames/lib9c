@@ -132,6 +132,31 @@ namespace Lib9c.Tests.Action
                 Signer = _signerAddress,
                 BlockIndex = 1,
             }));
+
+            // Same (since 4531247)
+            if (states.TryGetStakeState(_signerAddress, out StakeState stakeState))
+            {
+                states = states.SetState(
+                    stakeState.address,
+                    new StakeState(stakeState.address, 4424909 - 100).Serialize());
+            }
+
+            updateAction = new Stake(51);
+            Assert.Throws<RequiredBlockIndexException>(() => updateAction.Execute(new ActionContext
+            {
+                PreviousStates = states,
+                Signer = _signerAddress,
+                BlockIndex = 4531247,
+            }));
+
+            // At 4424908, it should be updated.
+            Assert.True(updateAction.Execute(new ActionContext
+            {
+                PreviousStates = states,
+                Signer = _signerAddress,
+                BlockIndex = 4531246,
+            }).TryGetStakeState(_signerAddress, out stakeState));
+            Assert.Equal(4531246, stakeState.StartedBlockIndex);
         }
 
         [Fact]
