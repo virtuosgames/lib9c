@@ -87,6 +87,13 @@ namespace Nekoyume.Extensions
                         resultId,
                         requiredBlockIndex);
                     return true;
+                case ItemEnhancement9.ResultModel r:
+                    itemEnhanceMail = new ItemEnhanceMail(
+                        r,
+                        blockIndex,
+                        resultId,
+                        requiredBlockIndex);
+                    return true;
                 case CombinationConsumable5.ResultModel r:
                     combinationMail = new CombinationMail(
                         r,
