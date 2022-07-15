@@ -100,11 +100,14 @@ namespace Nekoyume.Action
                     .SetState(ctx.Signer, MarkChanged);
             }
 
-            var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
-            var arenaSheetState = states.GetState(arenaSheetAddress);
-            if (arenaSheetState != null)
+            if (context.BlockIndex > 4374176)
             {
-                throw new ActionObsoletedException(nameof(Buy11));
+                var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
+                var arenaSheetState = states.GetState(arenaSheetAddress);
+                if (arenaSheetState != null)
+                {
+                    throw new ActionObsoletedException(nameof(Buy11));
+                }
             }
 
             var addressesHex = GetSignerAndOtherAddressesHex(context, buyerAvatarAddress);

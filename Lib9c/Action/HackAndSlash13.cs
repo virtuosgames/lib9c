@@ -69,11 +69,15 @@ namespace Nekoyume.Action
                 return states.SetState(ctx.Signer, MarkChanged);
             }
 
-            var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
-            var arenaSheetState = states.GetState(arenaSheetAddress);
-            if (arenaSheetState != null)
+            if (context.BlockIndex > 4374157)
             {
-                throw new ActionObsoletedException(nameof(HackAndSlash13));
+                var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
+                var arenaSheetState = states.GetState(arenaSheetAddress);
+                if (arenaSheetState != null)
+                {
+                    Log.Debug(nameof(HackAndSlash13));
+                    throw new ActionObsoletedException(nameof(HackAndSlash13));
+                }
             }
 
             var addressesHex = GetSignerAndOtherAddressesHex(context, avatarAddress);

@@ -135,11 +135,14 @@ namespace Nekoyume.Action
                     .SetState(slotAddress, MarkChanged);
             }
 
-            var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
-            var arenaSheetState = states.GetState(arenaSheetAddress);
-            if (arenaSheetState != null)
+            if (context.BlockIndex > 4374195)
             {
-                throw new ActionObsoletedException(nameof(ItemEnhancement10));
+                var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
+                var arenaSheetState = states.GetState(arenaSheetAddress);
+                if (arenaSheetState != null)
+                {
+                    throw new ActionObsoletedException(nameof(ItemEnhancement10));
+                }
             }
 
             var addressesHex = GetSignerAndOtherAddressesHex(context, avatarAddress);

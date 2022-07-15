@@ -62,6 +62,11 @@ namespace Nekoyume.Action
             }
 
             var slotState = states.GetCombinationSlotState(avatarAddress, slotIndex);
+            if (context.BlockIndex > 4377159 && context.BlockIndex < 4377430 && slotState.Result is ItemEnhancement9.ResultModel)
+            {
+                return states;
+            }
+
             if (slotState?.Result is null)
             {
                 throw new CombinationSlotResultNullException($"{addressesHex}CombinationSlot Result is null. ({avatarAddress}), ({slotIndex})");
