@@ -56,12 +56,14 @@ namespace Nekoyume.Action
 
             if (context.BlockIndex > 4374161)
             {
-                var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
-                var arenaSheetState = states.GetState(arenaSheetAddress);
-                if (arenaSheetState != null)
-                {
-                    throw new ActionObsoletedException(nameof(RankingBattle));
-                }
+                return states;
+            }
+
+            var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
+            var arenaSheetState = states.GetState(arenaSheetAddress);
+            if (arenaSheetState != null)
+            {
+                throw new ActionObsoletedException(nameof(RankingBattle));
             }
 
             var sw = new Stopwatch();

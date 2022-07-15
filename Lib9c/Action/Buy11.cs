@@ -10,6 +10,7 @@ using Libplanet.Action;
 using Libplanet.Assets;
 using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Mail;
+using Nekoyume.Model.Stat;
 using Nekoyume.Model.State;
 using Nekoyume.TableData;
 using Serilog;
@@ -102,12 +103,14 @@ namespace Nekoyume.Action
 
             if (context.BlockIndex > 4374176)
             {
-                var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
-                var arenaSheetState = states.GetState(arenaSheetAddress);
-                if (arenaSheetState != null)
-                {
-                    throw new ActionObsoletedException(nameof(Buy11));
-                }
+                return states;
+            }
+
+            var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
+            var arenaSheetState = states.GetState(arenaSheetAddress);
+            if (arenaSheetState != null)
+            {
+                throw new ActionObsoletedException(nameof(Buy11));
             }
 
             var addressesHex = GetSignerAndOtherAddressesHex(context, buyerAvatarAddress);
