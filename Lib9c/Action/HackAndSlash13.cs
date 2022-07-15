@@ -71,13 +71,15 @@ namespace Nekoyume.Action
 
             if (context.BlockIndex > 4374157)
             {
-                var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
-                var arenaSheetState = states.GetState(arenaSheetAddress);
-                if (arenaSheetState != null)
-                {
-                    Log.Debug(nameof(HackAndSlash13));
-                    throw new ActionObsoletedException(nameof(HackAndSlash13));
-                }
+                return states;
+            }
+
+            var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
+            var arenaSheetState = states.GetState(arenaSheetAddress);
+            if (arenaSheetState != null)
+            {
+                Log.Debug(nameof(HackAndSlash13));
+                throw new ActionObsoletedException(nameof(HackAndSlash13));
             }
 
             var addressesHex = GetSignerAndOtherAddressesHex(context, avatarAddress);
