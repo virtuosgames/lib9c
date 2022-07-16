@@ -58,6 +58,7 @@ namespace Nekoyume.Action
             var arenaSheetState = states.GetState(arenaSheetAddress);
             if (arenaSheetState != null)
             {
+                // exception handling for v100240.
                 if (context.BlockIndex > 4374161)
                 {
                     return states;
