@@ -135,16 +135,23 @@ namespace Nekoyume.Action
                     .SetState(slotAddress, MarkChanged);
             }
 
-            if (context.BlockIndex > 4374195)
-            {
-                return states;
-            }
-
             var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
             var arenaSheetState = states.GetState(arenaSheetAddress);
             if (arenaSheetState != null)
             {
-                throw new ActionObsoletedException(nameof(ItemEnhancement10));
+                // exception handling for v100240.
+                if (context.BlockIndex > 4374195)
+                {
+                    return states;
+                }
+
+                if (context.BlockIndex > 4374144)
+                {
+                }
+                else
+                {
+                    throw new ActionObsoletedException(nameof(ItemEnhancement10));
+                }
             }
 
             var addressesHex = GetSignerAndOtherAddressesHex(context, avatarAddress);

@@ -90,6 +90,9 @@ namespace Nekoyume.Extensions
                 case ItemEnhancement7.ResultModel r:
                     resultId = r.id;
                     break;
+                case ItemEnhancement9.ResultModel r:
+                    resultId = r.id;
+                    break;
                 case MonsterCollectionResult r:
                     resultId = r.id;
                     break;
@@ -199,6 +202,13 @@ namespace Nekoyume.Extensions
                         requiredBlockIndex);
                     return true;
                 case ItemEnhancement7.ResultModel r:
+                    itemEnhanceMail = new ItemEnhanceMail(
+                        r,
+                        blockIndex,
+                        resultId,
+                        requiredBlockIndex);
+                    return true;
+                case ItemEnhancement9.ResultModel r:
                     itemEnhanceMail = new ItemEnhanceMail(
                         r,
                         blockIndex,

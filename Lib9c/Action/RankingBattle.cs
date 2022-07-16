@@ -54,16 +54,22 @@ namespace Nekoyume.Action
 
             var addressesHex = GetSignerAndOtherAddressesHex(context, avatarAddress, enemyAddress);
 
-            if (context.BlockIndex > 4374161)
-            {
-                return states;
-            }
-
             var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
             var arenaSheetState = states.GetState(arenaSheetAddress);
             if (arenaSheetState != null)
             {
-                throw new ActionObsoletedException(nameof(RankingBattle));
+                if (context.BlockIndex > 4374161)
+                {
+                    return states;
+                }
+
+                if (context.BlockIndex > 4374126)
+                {
+                }
+                else
+                {
+                    throw new ActionObsoletedException(nameof(RankingBattle));
+                }
             }
 
             var sw = new Stopwatch();

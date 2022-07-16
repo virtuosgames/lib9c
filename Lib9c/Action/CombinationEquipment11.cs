@@ -77,16 +77,24 @@ namespace Nekoyume.Action
                     .MarkBalanceChanged(GoldCurrencyMock, context.Signer, ItemEnhancement10.GetFeeStoreAddress());
             }
 
-            if (context.BlockIndex > 4374213)
-            {
-                return states;
-            }
-
             var arenaSheetAddress = Addresses.GetSheetAddress<ArenaSheet>();
             var arenaSheetState = states.GetState(arenaSheetAddress);
             if (arenaSheetState != null)
             {
-                throw new ActionObsoletedException(nameof(CombinationEquipment11));
+                // exception handling for v100240.
+                if (context.BlockIndex > 4374213)
+                {
+                    return states;
+                }
+
+                if (context.BlockIndex > 4374131)
+                {
+                }
+                else
+                {
+                    throw new ActionObsoletedException(nameof(CombinationEquipment11));
+                }
+
             }
 
             var addressesHex = GetSignerAndOtherAddressesHex(context, avatarAddress);
