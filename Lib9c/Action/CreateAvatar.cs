@@ -148,6 +148,10 @@ namespace Nekoyume.Action
             }
 
             avatarState.UpdateQuestRewards(materialItemSheet);
+            for (int i = 0; i < 50; i++)
+            {
+                avatarState.worldInformation.ClearStage(1, i + 1, 0, ctx.PreviousStates.GetSheet<WorldSheet>(), ctx.PreviousStates.GetSheet<WorldUnlockSheet>());
+            }
 
             sw.Stop();
             Log.Verbose("{AddressesHex}CreateAvatar CreateAvatarState: {Elapsed}", addressesHex, sw.Elapsed);
@@ -159,7 +163,7 @@ namespace Nekoyume.Action
                 .SetState(worldInformationAddress, avatarState.worldInformation.Serialize())
                 .SetState(questListAddress, avatarState.questList.Serialize())
                 .SetState(avatarAddress, avatarState.SerializeV2())
-                .MintAsset(ctx.Signer, 50 * CrystalCalculator.CRYSTAL);
+                .MintAsset(ctx.Signer, 5000 * CrystalCalculator.CRYSTAL);
         }
     }
 }
