@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using Bencodex.Types;
 using Libplanet;
@@ -153,7 +152,7 @@ namespace Nekoyume.Action
             // Validate fields.
             sw.Restart();
             var scheduleSheet = sheets.GetSheet<EventScheduleSheet>();
-            var scheduleRow = scheduleSheet.ValidateFromAction(
+            var scheduleRow = scheduleSheet.ValidateFromActionForDungeon(
                 context.BlockIndex,
                 eventScheduleId,
                 eventDungeonId,
