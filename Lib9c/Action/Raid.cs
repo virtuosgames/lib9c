@@ -48,19 +48,30 @@ namespace Nekoyume.Action
                     50, current);
             }
 
-            Dictionary<Type, (Address, ISheet)> sheets = states.GetSheets(sheetTypes: new [] {
+            Dictionary<Type, (Address, ISheet)> sheets = states.GetSheets(
+                containRaidSimulatorSheets: true,
+                sheetTypes: new [] {
+                typeof(MaterialItemSheet),
+                typeof(SkillSheet),
+                typeof(SkillBuffSheet),
+                typeof(BuffSheet),
+                typeof(CharacterLevelSheet),
+                typeof(EquipmentItemSetEffectSheet),
+                typeof(WorldBossCharacterSheet),
                 typeof(WorldBossListSheet),
                 typeof(WorldBossGlobalHpSheet),
+                typeof(EnemySkillSheet),
                 typeof(CharacterSheet),
                 typeof(CostumeStatSheet),
+                typeof(RuneWeightSheet),
+                typeof(WorldBossKillRewardSheet),
+                typeof(RuneSheet),
             });
             var worldBossListSheet = sheets.GetSheet<WorldBossListSheet>();
             var row = worldBossListSheet.FindRowByBlockIndex(context.BlockIndex);
             int raidId = row.Id;
             Address worldBossAddress = Addresses.GetWorldBossAddress(raidId);
             Address raiderAddress = Addresses.GetRaiderAddress(AvatarAddress, raidId);
-            Address raidersAddress = Addresses.GetRaidersAddress(raidId);
-
             // Check challenge count.
             RaiderState raiderState;
             if (states.TryGetState(raiderAddress, out List rawState))
@@ -70,41 +81,32 @@ namespace Nekoyume.Action
             else
             {
                 raiderState = new RaiderState();
-                // FIXME delete raiders & calculate rank in DP.
-                List<Address> raiders = states.TryGetState(raidersAddress, out List rawRaiders)
-                    ? rawRaiders.ToList(StateExtensions.ToAddress)
-                    : new List<Address>();
-                raiders.Add(AvatarAddress);
                 FungibleAssetValue crystalCost = CrystalCalculator.CalculateEntranceFee(avatarState.level, row.EntranceFee);
-                states = states
-                    .SetState(raidersAddress, new List(raiders.Select(a => a.Serialize())))
-                    .TransferAsset(context.Signer, worldBossAddress, crystalCost);
+                states = states.TransferAsset(context.Signer, worldBossAddress, crystalCost);
+            }
+
+            if (WorldBossHelper.CanRefillTicket(context.BlockIndex, raiderState.RefillBlockIndex, row.StartedBlockIndex))
+            {
+                raiderState.RemainChallengeCount = WorldBossHelper.MaxChallengeCount;
+                raiderState.RefillBlockIndex = context.BlockIndex;
             }
 
             if (raiderState.RemainChallengeCount < 1)
             {
-                if (WorldBossHelper.CanRefillTicket(context.BlockIndex, raiderState.RefillBlockIndex, row.StartedBlockIndex))
+                if (PayNcg)
                 {
-                    raiderState.RemainChallengeCount = 3;
-                    raiderState.RefillBlockIndex = context.BlockIndex;
+                    if (raiderState.PurchaseCount >= row.MaxPurchaseCount)
+                    {
+                        throw new ExceedTicketPurchaseLimitException("");
+                    }
+                    var goldCurrency = states.GetGoldCurrency();
+                    states = states.TransferAsset(context.Signer, worldBossAddress,
+                        WorldBossHelper.CalculateTicketPrice(row, raiderState, goldCurrency));
+                    raiderState.PurchaseCount++;
                 }
                 else
                 {
-                    if (PayNcg)
-                    {
-                        if (raiderState.PurchaseCount >= row.MaxPurchaseCount)
-                        {
-                            throw new ExceedTicketPurchaseLimitException("");
-                        }
-                        var goldCurrency = states.GetGoldCurrency();
-                        states = states.TransferAsset(context.Signer, worldBossAddress,
-                            WorldBossHelper.CalculateTicketPrice(row, raiderState, goldCurrency));
-                        raiderState.PurchaseCount++;
-                    }
-                    else
-                    {
-                        throw new ExceedPlayCountException("");
-                    }
+                    throw new ExceedPlayCountException("");
                 }
             }
 
@@ -112,12 +114,8 @@ namespace Nekoyume.Action
             avatarState.ValidateEquipmentsV2(EquipmentIds, context.BlockIndex);
             avatarState.ValidateConsumable(FoodIds, context.BlockIndex);
             avatarState.ValidateCostume(CostumeIds);
-            // Simulate.
-            int score = 10_000;
-            int cp = CPHelper.GetCPV2(avatarState, sheets.GetSheet<CharacterSheet>(),
-                sheets.GetSheet<CostumeStatSheet>());
-            raiderState.Update(avatarState, cp, score, PayNcg);
             // Reward.
+            int previousHighScore = raiderState.HighScore;
             WorldBossState bossState;
             WorldBossGlobalHpSheet hpSheet = sheets.GetSheet<WorldBossGlobalHpSheet>();
             if (states.TryGetState(worldBossAddress, out List rawBossState))
@@ -128,16 +126,66 @@ namespace Nekoyume.Action
             {
                 bossState = new WorldBossState(row, hpSheet[1]);
             }
-            bossState.CurrentHp -= score;
-            if (bossState.CurrentHp <= 0)
-            {
-                if (bossState.Level < hpSheet.OrderedList.Last().Level)
-                {
-                    bossState.Level++;
-                }
-                bossState.CurrentHp = hpSheet[bossState.Level].Hp;
-            }
             // Update State.
+            if (raiderState.LatestBossLevel < bossState.Level)
+            {
+                // reward
+                var worldBossKillRewardRecordAddress = Addresses.GetWorldBossKillRewardRecordAddress(AvatarAddress, raidId);
+                WorldBossKillRewardRecord rewardRecord;
+                if (states.TryGetState(worldBossKillRewardRecordAddress, out List rawList))
+                {
+                    rewardRecord = new WorldBossKillRewardRecord(rawList);
+                    // calculate with previous high score.
+                    int rank = WorldBossHelper.CalculateRank(previousHighScore);
+                    states = states.SetWorldBossKillReward(
+                        worldBossKillRewardRecordAddress,
+                        rewardRecord,
+                        rank,
+                        bossState,
+                        sheets.GetSheet<RuneWeightSheet>(),
+                        sheets.GetSheet<WorldBossKillRewardSheet>(),
+                        sheets.GetSheet<RuneSheet>(),
+                        context.Random,
+                        AvatarAddress
+                    );
+                }
+                else
+                {
+                    rewardRecord = new WorldBossKillRewardRecord();
+                }
+
+                // Simulate.
+                var simulator = new RaidSimulator(
+                    row.BossId,
+                    context.Random,
+                    avatarState,
+                    FoodIds,
+                    sheets.GetRaidSimulatorSheets());
+                simulator.Simulate();
+
+                int score = simulator.DamageDealt;
+                int cp = CPHelper.GetCPV2(avatarState, sheets.GetSheet<CharacterSheet>(),
+                    sheets.GetSheet<CostumeStatSheet>());
+                raiderState.Update(avatarState, cp, score, PayNcg);
+
+                // Reward.
+                bossState.CurrentHp -= score;
+                if (bossState.CurrentHp <= 0)
+                {
+                    if (bossState.Level < hpSheet.OrderedList.Last().Level)
+                    {
+                        bossState.Level++;
+                    }
+                    bossState.CurrentHp = hpSheet[bossState.Level].Hp;
+                }
+                // Save level infos;
+                raiderState.LatestBossLevel = bossState.Level;
+                if (!rewardRecord.ContainsKey(raiderState.LatestBossLevel))
+                {
+                    rewardRecord.Add(raiderState.LatestBossLevel, false);
+                }
+                states = states.SetState(worldBossKillRewardRecordAddress, rewardRecord.Serialize());
+            }
             return states
                 .SetState(worldBossAddress, bossState.Serialize())
                 .SetState(raiderAddress, raiderState.Serialize());
