@@ -130,7 +130,7 @@ namespace Nekoyume.Action
             else
             {
                 // exception handling for v100240.
-                if (context.BlockIndex > 4372673 && context.BlockIndex < 4374195)
+                if (context.BlockIndex > 4133442 && context.BlockIndex < 4374195)
                 {
                     if (slotState.TryGetResultId(out var resultIdFix) &&
                         avatarState.mailBox.All(mail => mail.id != resultIdFix) &&
