@@ -69,6 +69,12 @@ namespace Nekoyume.Action
                     context.TxId.ToString() ==
                     "8e2e0c97ab68aec8db94562f8f75ec4cc35f026e035481be6122fdca2020085a" ||
                     context.TxId.ToString() ==
+                    "dd8afb78560bda6b2cf70c5be9695057bb71445ddad7b87b56d6e7392fcfb7ac" ||
+                    context.TxId.ToString() ==
+                    "9af2ca94a55a0c4e77df6da39eb920be1048c05cecbbbc986adc122ad003c1c8" ||
+                    context.TxId.ToString() ==
+                    "9830458deed68df0e5dc19339c32272d4a463432b5a2133aee40e900a84c259b" ||
+                    context.TxId.ToString() ==
                     "0862c8103e3f4d63d51c492f7417bd98860843f2f9953d9032a65b2abc1bd437" ||
                     context.TxId.ToString() ==
                     "8017498b465233e32f23b1963975771ded84b9bcc11510aeee9c337451f46d26" ||
