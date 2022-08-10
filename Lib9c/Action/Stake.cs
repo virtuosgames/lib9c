@@ -59,7 +59,7 @@ namespace Nekoyume.Action
                         StakeState.DeriveAddress(context.Signer));
             }
 
-            if (context.BlockIndex > 4286622 && context.BlockIndex < 4287696)
+            if (context.BlockIndex > 4286621 && context.BlockIndex < 4287696)
             {
                 if (context.TxId.ToString() ==
                     "8e2e0c97ab68aec8db94562f8f75ec4cc35f026e035481be6122fdca2020085a" ||
