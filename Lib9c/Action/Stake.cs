@@ -61,7 +61,12 @@ namespace Nekoyume.Action
 
             if (context.BlockIndex > 4286621 && context.BlockIndex < 4287696)
             {
-                if (context.TxId.ToString() ==
+                if (
+                    context.TxId.ToString() ==
+                    "a9ee9611c0a319c1c726f75ff9dab0551e07f7b95c611db80d370308010b28d3" ||
+                    context.TxId.ToString() ==
+                    "18cea2547a29da7f58c0979a8f253a59bfbb8c5f73b10f76b1938cc45f23cdb6" ||
+                    context.TxId.ToString() ==
                     "8e2e0c97ab68aec8db94562f8f75ec4cc35f026e035481be6122fdca2020085a" ||
                     context.TxId.ToString() ==
                     "0862c8103e3f4d63d51c492f7417bd98860843f2f9953d9032a65b2abc1bd437" ||
