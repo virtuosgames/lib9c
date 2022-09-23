@@ -5,11 +5,13 @@ using System.Linq;
 using System.Security.Cryptography;
 using Libplanet;
 using Libplanet.Action;
+using Libplanet.Action.Sys;
 using Libplanet.Assets;
 using Libplanet.Blockchain;
 using Libplanet.Blocks;
 using Libplanet.Crypto;
 using Libplanet.PoS;
+using Libplanet.Tx;
 using Nekoyume.Action;
 using Nekoyume.BlockChain.Policy;
 using Nekoyume.Model.State;
@@ -20,6 +22,31 @@ namespace Nekoyume
 {
     public static class BlockHelper
     {
+        public static List<Transaction<PolymorphicAction<ActionBase>>> GenesisValidatorTransaction(
+            List<PrivateKey> privateKeys)
+        {
+            var txs = new List<Transaction<PolymorphicAction<ActionBase>>>();
+            Currency governance = Asset.GovernanceToken;
+            foreach (var privateKey in privateKeys)
+            {
+                txs.Add(Transaction<PolymorphicAction<ActionBase>>.Create(
+                    0,
+                    privateKey,
+                    null,
+                    new Mint(
+                        privateKey.ToAddress(),
+                        new FungibleAssetValue(governance, 1000, 0))));
+                txs.Add(Transaction<PolymorphicAction<ActionBase>>.Create(
+                    1,
+                    privateKey,
+                    null,
+                    new PromoteValidator(
+                        privateKey.PublicKey,
+                        new FungibleAssetValue(governance, 300, 0))));
+            }
+
+            return txs;
+        }
         public static Block<PolymorphicAction<ActionBase>> ProposeGenesisBlock(
             IDictionary<string, string> tableSheets,
             GoldDistribution[] goldDistributions,
@@ -31,8 +58,8 @@ namespace Nekoyume
             IEnumerable<string> credits = null,
             PrivateKey privateKey = null,
             DateTimeOffset? timestamp = null,
-            IEnumerable<ActionBase> actionBases = null
-        )
+            IEnumerable<ActionBase> actionBases = null,
+            IEnumerable<PrivateKey> initialValidator = null)
         {
             if (!tableSheets.TryGetValue(nameof(GameConfigSheet), out var csv))
             {
@@ -74,6 +101,7 @@ namespace Nekoyume
             {
                 initialStatesAction,
             };
+
             if (!(actionBases is null))
             {
                 actions.AddRange(actionBases.Select(actionBase =>
@@ -81,13 +109,17 @@ namespace Nekoyume
             }
 
             var blockAction = new BlockPolicySource(Log.Logger).GetPolicy().BlockAction;
+            var nativeTokens = new BlockPolicySource(Log.Logger).GetPolicy().NativeTokens;
             return
                 BlockChain<PolymorphicAction<ActionBase>>.ProposeGenesisBlock(
                     actions,
                     privateKey: privateKey,
                     blockAction: blockAction,
                     timestamp: timestamp,
-                    nativeTokens: new Currency[] { Asset.GovernanceToken }.ToImmutableHashSet());
+                    nativeTokenPredicate: nativeTokens.Contains,
+                    nativeTokens: nativeTokens,
+                    manualTransaction: GenesisValidatorTransaction(
+                        initialValidator?.ToList()));
         }
     }
 }
