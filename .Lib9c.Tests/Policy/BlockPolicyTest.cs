@@ -58,7 +58,8 @@ namespace Lib9c.Tests
                 new VolatileStagePolicy<PolymorphicAction<ActionBase>>();
             Block<PolymorphicAction<ActionBase>> genesis = MakeGenesisBlock(
                 adminAddress,
-                ImmutableHashSet.Create(adminAddress)
+                ImmutableHashSet.Create(adminAddress),
+                initialValidator: new[] { new PrivateKey() }
             );
             using var store = new DefaultStore(null);
             using var stateStore = new TrieStateStore(new DefaultKeyValueStore(null));
@@ -156,7 +157,8 @@ namespace Lib9c.Tests
                     5,
                     10
                 ),
-                pendingActivations: new[] { ps }
+                pendingActivations: new[] { ps },
+                initialValidator: new[] { new PrivateKey() }
             );
             using var store = new DefaultStore(null);
             using var stateStore = new TrieStateStore(new DefaultKeyValueStore(null));
@@ -203,7 +205,8 @@ namespace Lib9c.Tests
                     5,
                     10
                 ),
-                pendingActivations: new[] { ps }
+                pendingActivations: new[] { ps },
+                initialValidator: new[] { adminPrivateKey }
             );
 
             using var store = new DefaultStore(null);
@@ -252,7 +255,7 @@ namespace Lib9c.Tests
             blockChain.Append(blockChain.ProposeBlock(adminPrivateKey));
 
             FungibleAssetValue actualBalance = blockChain.GetBalance(adminAddress, _currency);
-            FungibleAssetValue expectedBalance = new FungibleAssetValue(_currency, 110, 0);
+            FungibleAssetValue expectedBalance = new FungibleAssetValue(_currency, 910, 0);
             Assert.Equal(expectedBalance, actualBalance);
         }
 
@@ -285,7 +288,8 @@ namespace Lib9c.Tests
                 new VolatileStagePolicy<PolymorphicAction<ActionBase>>();
             Block<PolymorphicAction<ActionBase>> genesis = MakeGenesisBlock(
                 adminAddress,
-                ImmutableHashSet<Address>.Empty);
+                ImmutableHashSet<Address>.Empty,
+                initialValidator: new[] { new PrivateKey() });
             using var store = new DefaultStore(null);
             using var stateStore = new TrieStateStore(new DefaultKeyValueStore(null));
             var blockChain = new BlockChain<PolymorphicAction<ActionBase>>(
@@ -365,7 +369,10 @@ namespace Lib9c.Tests
             IStagePolicy<PolymorphicAction<ActionBase>> stagePolicy =
                 new VolatileStagePolicy<PolymorphicAction<ActionBase>>();
             Block<PolymorphicAction<ActionBase>> genesis =
-                MakeGenesisBlock(adminPublicKey.ToAddress(), ImmutableHashSet<Address>.Empty);
+                MakeGenesisBlock(
+                    adminPublicKey.ToAddress(),
+                    ImmutableHashSet<Address>.Empty,
+                    initialValidator: new[] { new PrivateKey() });
 
             using var store = new DefaultStore(null);
             var stateStore = new TrieStateStore(new MemoryKeyValueStore());
@@ -452,7 +459,10 @@ namespace Lib9c.Tests
             IStagePolicy<PolymorphicAction<ActionBase>> stagePolicy =
                 new VolatileStagePolicy<PolymorphicAction<ActionBase>>();
             Block<PolymorphicAction<ActionBase>> genesis =
-                MakeGenesisBlock(adminPublicKey.ToAddress(), ImmutableHashSet<Address>.Empty);
+                MakeGenesisBlock(
+                    adminPublicKey.ToAddress(),
+                    ImmutableHashSet<Address>.Empty,
+                    initialValidator: new[] { new PrivateKey() });
 
             using var store = new DefaultStore(null);
             var stateStore = new TrieStateStore(new MemoryKeyValueStore());
@@ -543,7 +553,8 @@ namespace Lib9c.Tests
             Block<PolymorphicAction<ActionBase>> genesis = MakeGenesisBlock(
                 default(Address),
                 ImmutableHashSet<Address>.Empty,
-                pendingActivations: pendingActivations);
+                pendingActivations: pendingActivations,
+                initialValidator: new[] { new PrivateKey() });
             using var store = new DefaultStore(null);
             using var stateStore = new TrieStateStore(new DefaultKeyValueStore(null));
             var blockPolicySource = new BlockPolicySource(Logger.None);
@@ -624,7 +635,8 @@ namespace Lib9c.Tests
             Block<PolymorphicAction<ActionBase>> genesis = MakeGenesisBlock(
                 default(Address),
                 ImmutableHashSet<Address>.Empty,
-                pendingActivations: pendingActivations);
+                pendingActivations: pendingActivations,
+                initialValidator: new[] { new PrivateKey() });
             using var store = new DefaultStore(null);
             using var stateStore = new TrieStateStore(new DefaultKeyValueStore(null));
             var blockPolicySource = new BlockPolicySource(Logger.None);
@@ -720,7 +732,8 @@ namespace Lib9c.Tests
             IImmutableSet<Address> activatedAddresses,
             AuthorizedMinersState authorizedMinersState = null,
             DateTimeOffset? timestamp = null,
-            PendingActivationState[] pendingActivations = null
+            PendingActivationState[] pendingActivations = null,
+            IEnumerable<PrivateKey> initialValidator = null
         )
         {
             if (pendingActivations is null)
@@ -742,7 +755,8 @@ namespace Lib9c.Tests
                 isActivateAdminAddress: false,
                 credits: null,
                 privateKey: _privateKey,
-                timestamp: timestamp ?? DateTimeOffset.MinValue);
+                timestamp: timestamp ?? DateTimeOffset.MinValue,
+                initialValidator: initialValidator);
         }
     }
 }

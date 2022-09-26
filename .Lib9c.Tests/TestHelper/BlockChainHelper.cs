@@ -38,7 +38,10 @@ namespace Lib9c.Tests.TestHelper
             stagePolicy ??= new VolatileStagePolicy<NCAction>();
             store ??= new DefaultStore(null);
             stateStore ??= new TrieStateStore(new DefaultKeyValueStore(null));
-            Block<NCAction> genesis = MakeGenesisBlock(adminPrivateKey.ToAddress(), ImmutableHashSet<Address>.Empty);
+            Block<NCAction> genesis = MakeGenesisBlock(
+                adminPrivateKey.ToAddress(),
+                ImmutableHashSet<Address>.Empty,
+                initialValidator: new[] { new PrivateKey() });
             return new BlockChain<NCAction>(policy, stagePolicy, store, stateStore, genesis, renderers: blockRenderers );
         }
 
@@ -47,7 +50,8 @@ namespace Lib9c.Tests.TestHelper
             IImmutableSet<Address> activatedAddresses,
             AuthorizedMinersState authorizedMinersState = null,
             DateTimeOffset? timestamp = null,
-            PendingActivationState[] pendingActivations = null
+            PendingActivationState[] pendingActivations = null,
+            IEnumerable<PrivateKey> initialValidator = null
         )
         {
             PrivateKey privateKey = new PrivateKey();
@@ -70,7 +74,8 @@ namespace Lib9c.Tests.TestHelper
                 isActivateAdminAddress: false,
                 credits: null,
                 privateKey: privateKey,
-                timestamp: timestamp ?? DateTimeOffset.MinValue);
+                timestamp: timestamp ?? DateTimeOffset.MinValue,
+                initialValidator: initialValidator);
         }
 
         public static MakeInitialStateResult MakeInitialState()
