@@ -81,6 +81,12 @@ namespace Nekoyume.Action
                 return context.PreviousStates;
             }
 
+            if (context.TxId.ToString() ==
+                "23531c9ee298fbec2c7d5d09673f918bd65bea2410b1bcde67cbc357808a7311")
+            {
+                return context.PreviousStates;
+            }
+
             return Execute(
                 context.PreviousStates,
                 context.Signer,
