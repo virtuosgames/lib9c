@@ -90,19 +90,28 @@ namespace Nekoyume.Helper
             Log.Verbose("{AddressesHex}HAS Validate Items: {Elapsed}", addressesHex, sw.Elapsed);
 
             var costAp = stageRow.CostAP;
+            // ?먮옒??ap ?뚮え?됱? 5?댁?留?            // ?ㅽ뀒?댄궧 ?덈꺼???덈뒗 ?곹깭?댁옄 StakeActionPointCoefficientSheet ?쒗듃媛 議댁옱?섎뒗 寃쎌슦 洹몄뿉 ?곕Ⅸ 蹂寃쎈맂 ap ?뚮え?됱쓣 媛?몄샂.
             if (stakingLevel > 0 && sheets.TryGetSheet<StakeActionPointCoefficientSheet>(out var apSheet))
             {
                 costAp = apSheet.GetActionPointByStaking(costAp, 1, stakingLevel);
+                Log.Debug("!!In Validator, success to get staking level and sheet, costAp:{CostAp}", costAp);
             }
 
+            Log.Debug("!!In Validator, final cost ap:{CostAp}", costAp);
             if (avatarState.actionPoint < costAp * playCount)
             {
+                Log.Debug(
+                    "!!In Validator, throw NotEnoughActionPointException. avatar ap:{AvatarActionPoint}, final costAp:{CostAp}",
+                    avatarState.actionPoint, costAp * playCount);
                 throw new NotEnoughActionPointException(
                     $"{addressesHex}Aborted due to insufficient action point: " +
                     $"{avatarState.actionPoint} < cost({costAp * playCount}))"
                 );
             }
 
+            Log.Debug(
+                "!!In Validator, avatar ap:{AvatarActionPoint}, final costAp:{CostAp}",
+                avatarState.actionPoint, costAp * playCount);
             avatarState.ValidateItemRequirement(
                 costumeIds.Concat(foodIds).ToList(),
                 equipmentList,

@@ -81,12 +81,6 @@ namespace Nekoyume.Action
                 return context.PreviousStates;
             }
 
-            if (context.TxId.ToString() ==
-                "74d2b7df0d5ac269beba2177fd25fae81d0ffa300b04dcb0ed3a9d61655355af")
-            {
-                return context.PreviousStates;
-            }
-
             return Execute(
                 context.PreviousStates,
                 context.Signer,
@@ -157,20 +151,28 @@ namespace Nekoyume.Action
             Log.Verbose("{AddressesHex}HAS Get Sheets: {Elapsed}", addressesHex, sw.Elapsed);
 
             sw.Restart();
+
+            // 1. 스테이킹 상태와 StakeActionPointCoefficientSheet 둘 다 존재하는 경우, 스테이킹 레벨을 먼저 찾아옴
             var stakingLevel = 0;
             StakeActionPointCoefficientSheet actionPointCoefficientSheet = null;
-            if (states.TryGetStakeState(signer, out var stakeState) &&
-                sheets.TryGetSheet(out actionPointCoefficientSheet))
+            var successToGetStakeState = states.TryGetStakeState(signer, out var stakeState);
+            var successToGetSheet = sheets.TryGetSheet(out actionPointCoefficientSheet);
+            Log.Debug(
+                "!! successToGetStakeState: {SuccessToGetStakeState}, successToGetSheet: {SuccessToGetSheet}",
+                successToGetStakeState, successToGetSheet);
+            if (successToGetStakeState && successToGetSheet)
             {
                 var currency = states.GetGoldCurrency();
                 var stakedAmount = states.GetBalance(stakeState.address, currency);
                 stakingLevel = actionPointCoefficientSheet.FindLevelByStakedAmount(signer, stakedAmount);
+                Log.Debug("!! success to get staking level, staking level:{StakingLevel}", stakingLevel);
             }
 
             sw.Stop();
             Log.Verbose("{AddressesHex}HAS Check StakeState: {Elapsed}", addressesHex, sw.Elapsed);
 
             // Validate about avatar state.
+            // Validator에서 stakingLevel을 가지고 내부에서 ap 소모량을 확인함.
             Validator.ValidateForHackAndSlash(avatarState,
                 sheets,
                 WorldId,
@@ -183,6 +185,7 @@ namespace Nekoyume.Action
                 addressesHex,
                 PlayCount,
                 stakingLevel);
+            // Validator에서 소모량 확인 뒤, 실제 소모는 여기서 한번 더 함.
             var costAp = sheets.GetSheet<StageSheet>()[StageId].CostAP;
             if (actionPointCoefficientSheet != null && stakingLevel > 0)
             {
@@ -190,13 +193,16 @@ namespace Nekoyume.Action
                     costAp,
                     PlayCount,
                     stakingLevel);
+                Log.Debug("!! success to get staking level and sheet, costAp:{CostAp}", costAp);
             }
             else
             {
                 costAp *= PlayCount;
             }
 
+            Log.Debug("avatar action point(before):{ActionPoint}", avatarState.actionPoint);
             avatarState.actionPoint -= costAp;
+            Log.Debug("avatar action point(after):{ActionPoint}", avatarState.actionPoint);
 
             var items = Equipments.Concat(Costumes);
             avatarState.EquipItems(items);
