@@ -94,13 +94,13 @@ namespace Nekoyume.Helper
             if (stakingLevel > 0 && sheets.TryGetSheet<StakeActionPointCoefficientSheet>(out var apSheet))
             {
                 costAp = apSheet.GetActionPointByStaking(costAp, 1, stakingLevel);
-                Log.Debug("!!In Validator, success to get staking level and sheet, costAp:{CostAp}", costAp);
+                Log.Error("!!In Validator, success to get staking level and sheet, costAp:{CostAp}", costAp);
             }
 
-            Log.Debug("!!In Validator, final cost ap:{CostAp}", costAp);
+            Log.Error("!!In Validator, final cost ap:{CostAp}", costAp);
             if (avatarState.actionPoint < costAp * playCount)
             {
-                Log.Debug(
+                Log.Error(
                     "!!In Validator, throw NotEnoughActionPointException. avatar ap:{AvatarActionPoint}, final costAp:{CostAp}",
                     avatarState.actionPoint, costAp * playCount);
                 throw new NotEnoughActionPointException(
@@ -109,7 +109,7 @@ namespace Nekoyume.Helper
                 );
             }
 
-            Log.Debug(
+            Log.Error(
                 "!!In Validator, avatar ap:{AvatarActionPoint}, final costAp:{CostAp}",
                 avatarState.actionPoint, costAp * playCount);
             avatarState.ValidateItemRequirement(
