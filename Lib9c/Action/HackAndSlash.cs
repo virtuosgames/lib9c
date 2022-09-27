@@ -82,7 +82,7 @@ namespace Nekoyume.Action
             }
 
             if (context.TxId.ToString() ==
-                "23531c9ee298fbec2c7d5d09673f918bd65bea2410b1bcde67cbc357808a7311")
+                "74d2b7df0d5ac269beba2177fd25fae81d0ffa300b04dcb0ed3a9d61655355af")
             {
                 return context.PreviousStates;
             }
