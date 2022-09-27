@@ -157,7 +157,7 @@ namespace Nekoyume.Action
             StakeActionPointCoefficientSheet actionPointCoefficientSheet = null;
             var successToGetStakeState = states.TryGetStakeState(signer, out var stakeState);
             var successToGetSheet = sheets.TryGetSheet(out actionPointCoefficientSheet);
-            Log.Error(
+            Console.WriteLine(
                 "!! successToGetStakeState: {SuccessToGetStakeState}, successToGetSheet: {SuccessToGetSheet}",
                 successToGetStakeState, successToGetSheet);
             if (successToGetStakeState && successToGetSheet)
@@ -165,7 +165,7 @@ namespace Nekoyume.Action
                 var currency = states.GetGoldCurrency();
                 var stakedAmount = states.GetBalance(stakeState.address, currency);
                 stakingLevel = actionPointCoefficientSheet.FindLevelByStakedAmount(signer, stakedAmount);
-                Log.Error("!! success to get staking level, staking level:{StakingLevel}", stakingLevel);
+                Console.WriteLine("!! success to get staking level, staking level:{StakingLevel}", stakingLevel);
             }
 
             sw.Stop();
@@ -193,16 +193,16 @@ namespace Nekoyume.Action
                     costAp,
                     PlayCount,
                     stakingLevel);
-                Log.Error("!! success to get staking level and sheet, costAp:{CostAp}", costAp);
+                Console.WriteLine("!! success to get staking level and sheet, costAp:{CostAp}", costAp);
             }
             else
             {
                 costAp *= PlayCount;
             }
 
-            Log.Error("avatar action point(before):{ActionPoint}", avatarState.actionPoint);
+            Console.WriteLine("avatar action point(before):{ActionPoint}", avatarState.actionPoint);
             avatarState.actionPoint -= costAp;
-            Log.Error("avatar action point(after):{ActionPoint}", avatarState.actionPoint);
+            Console.WriteLine("avatar action point(after):{ActionPoint}", avatarState.actionPoint);
 
             var items = Equipments.Concat(Costumes);
             avatarState.EquipItems(items);
