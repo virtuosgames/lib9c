@@ -158,14 +158,14 @@ namespace Nekoyume.Action
             var successToGetStakeState = states.TryGetStakeState(signer, out var stakeState);
             var successToGetSheet = sheets.TryGetSheet(out actionPointCoefficientSheet);
             Console.WriteLine(
-                "!! successToGetStakeState: {SuccessToGetStakeState}, successToGetSheet: {SuccessToGetSheet}",
+                "!! successToGetStakeState: {0}, successToGetSheet: {1}",
                 successToGetStakeState, successToGetSheet);
             if (successToGetStakeState && successToGetSheet)
             {
                 var currency = states.GetGoldCurrency();
                 var stakedAmount = states.GetBalance(stakeState.address, currency);
                 stakingLevel = actionPointCoefficientSheet.FindLevelByStakedAmount(signer, stakedAmount);
-                Console.WriteLine("!! success to get staking level, staking level:{StakingLevel}", stakingLevel);
+                Console.WriteLine("!! success to get staking level, staking level:{0}", stakingLevel);
             }
 
             sw.Stop();
@@ -193,16 +193,16 @@ namespace Nekoyume.Action
                     costAp,
                     PlayCount,
                     stakingLevel);
-                Console.WriteLine("!! success to get staking level and sheet, costAp:{CostAp}", costAp);
+                Console.WriteLine("!! success to get staking level and sheet, costAp:{0}", costAp);
             }
             else
             {
                 costAp *= PlayCount;
             }
 
-            Console.WriteLine("avatar action point(before):{ActionPoint}", avatarState.actionPoint);
+            Console.WriteLine("avatar action point(before):{0}", avatarState.actionPoint);
             avatarState.actionPoint -= costAp;
-            Console.WriteLine("avatar action point(after):{ActionPoint}", avatarState.actionPoint);
+            Console.WriteLine("avatar action point(after):{0}", avatarState.actionPoint);
 
             var items = Equipments.Concat(Costumes);
             avatarState.EquipItems(items);

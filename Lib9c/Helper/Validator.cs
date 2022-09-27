@@ -94,14 +94,14 @@ namespace Nekoyume.Helper
             if (stakingLevel > 0 && sheets.TryGetSheet<StakeActionPointCoefficientSheet>(out var apSheet))
             {
                 costAp = apSheet.GetActionPointByStaking(costAp, 1, stakingLevel);
-                Console.WriteLine("!!In Validator, success to get staking level and sheet, costAp:{CostAp}", costAp);
+                Console.WriteLine("!!In Validator, success to get staking level and sheet, costAp:{0}", costAp);
             }
 
-            Console.WriteLine("!!In Validator, final cost ap:{CostAp}", costAp);
+            Console.WriteLine("!!In Validator, final cost ap:{0}", costAp);
             if (avatarState.actionPoint < costAp * playCount)
             {
                 Console.WriteLine(
-                    "!!In Validator, throw NotEnoughActionPointException. avatar ap:{AvatarActionPoint}, final costAp:{CostAp}",
+                    "!!In Validator, throw NotEnoughActionPointException. avatar ap:{0}, final costAp:{1}",
                     avatarState.actionPoint, costAp * playCount);
                 throw new NotEnoughActionPointException(
                     $"{addressesHex}Aborted due to insufficient action point: " +
@@ -110,7 +110,7 @@ namespace Nekoyume.Helper
             }
 
             Console.WriteLine(
-                "!!In Validator, avatar ap:{AvatarActionPoint}, final costAp:{CostAp}",
+                "!!In Validator, avatar ap:{0}, final costAp:{1}",
                 avatarState.actionPoint, costAp * playCount);
             avatarState.ValidateItemRequirement(
                 costumeIds.Concat(foodIds).ToList(),
