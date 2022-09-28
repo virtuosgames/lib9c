@@ -489,7 +489,7 @@ namespace Lib9c.Tests.Action
             Block<PolymorphicAction<ActionBase>> genesis;
             if (mainnet)
             {
-                const string genesisBlockPath = "https://download.nine-chronicles.com/pos-genesis/genesis-block-pos-20220923-01";
+                const string genesisBlockPath = "https://download.nine-chronicles.com/pos-genesis/genesis-block-pos-20220928-00";
                 var uri = new Uri(genesisBlockPath);
                 using var client = new HttpClient();
                 var rawBlock = await client.GetByteArrayAsync(uri);
