@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -191,11 +191,10 @@ namespace Lib9c.DevExtensions
         public static T LoadData<T>(string fileName)
         {
             var path = GetDataPath(fileName);
-            if(UnityEngine.Application.platform == UnityEngine.RuntimePlatform.Android)
-            {
-                path = Path.Combine(Application.streamingAssetsPath, fileName);
-                path += ".json";
-            }
+#if UNITY_ANDROID
+            path = Path.Combine(Application.streamingAssetsPath, fileName);
+            path += ".json";
+#endif
             var data = LoadJsonFile<T>(path);
             return data;
         }
@@ -214,16 +213,15 @@ namespace Lib9c.DevExtensions
 
         private static T LoadJsonFile<T>(string path)
         {
-            if(UnityEngine.Application.platform == UnityEngine.RuntimePlatform.Android)
+#if UNITY_ANDROID
+            UnityEngine.WWW www = new UnityEngine.WWW(path);
+            while (!www.isDone)
             {
-                UnityEngine.WWW www = new UnityEngine.WWW(path);
-                while (!www.isDone)
-                {
                     // wait for data load
-                }
-                var output = JsonConvert.DeserializeObject<T>(www.text);
-                return output;
             }
+            var output = JsonConvert.DeserializeObject<T>(www.text);
+            return output;
+#else
             var fileStream = new FileStream(path, FileMode.Open);
             var data = new byte[fileStream.Length];
             fileStream.Read(data, 0, data.Length);
@@ -231,6 +229,7 @@ namespace Lib9c.DevExtensions
             var jsonData = Encoding.UTF8.GetString(data);
             var result = JsonConvert.DeserializeObject<T>(jsonData);
             return result;
+#endif
         }
 
 
