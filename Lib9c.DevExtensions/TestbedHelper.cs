@@ -191,7 +191,7 @@ namespace Lib9c.DevExtensions
         public static T LoadData<T>(string fileName)
         {
             var path = GetDataPath(fileName);
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
             path = Path.Combine(Application.streamingAssetsPath, fileName);
             path += ".json";
 #endif
@@ -213,7 +213,7 @@ namespace Lib9c.DevExtensions
 
         private static T LoadJsonFile<T>(string path)
         {
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
             UnityEngine.WWW www = new UnityEngine.WWW(path);
             while (!www.isDone)
             {

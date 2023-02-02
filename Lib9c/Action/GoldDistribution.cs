@@ -37,7 +37,7 @@ namespace Nekoyume.Action
         public static GoldDistribution[] LoadInDescendingEndBlockOrder(string csvPath)
         {
             GoldDistribution[] records;
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
             UnityEngine.WWW www = new UnityEngine.WWW(csvPath);
             while (!www.isDone)
             {
